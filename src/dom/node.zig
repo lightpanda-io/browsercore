@@ -33,6 +33,13 @@ pub const Node = struct {
         try parser.nodeWalk(self, create_tree);
     }
 
+    pub fn toInterface(node: *parser.Node) Nodes {
+        return switch (parser.nodeType(node)) {
+            .element => E.toInterface(Nodes, @ptrCast(*parser.Element, node)),
+            else => @panic("unknown element"),
+        };
+    }
+
     // JS funcs
     // --------
 
@@ -40,7 +47,7 @@ pub const Node = struct {
         if (self.first_child == null) {
             return null;
         }
-        return E.toInterface(Nodes, @ptrCast(*parser.Element, self.first_child));
+        return Node.toInterface(self.first_child);
     }
 };
 

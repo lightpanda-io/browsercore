@@ -159,20 +159,20 @@ pub const EventTarget = c.lxb_dom_event_target_t;
 pub const Node = c.lxb_dom_node_t;
 
 pub const NodeType = enum(u4) {
-    undef,
-    element,
-    attribute,
-    text,
-    cdata_section,
-    entity_reference,
-    entity,
-    processing_instruction,
-    comment,
-    document,
-    document_type,
-    document_fragment,
-    notation,
-    last_entry,
+    undef = c.LXB_DOM_NODE_TYPE_UNDEF,
+    element = c.LXB_DOM_NODE_TYPE_ELEMENT,
+    attribute = c.LXB_DOM_NODE_TYPE_ATTRIBUTE,
+    text = c.LXB_DOM_NODE_TYPE_TEXT,
+    cdata_section = c.LXB_DOM_NODE_TYPE_CDATA_SECTION,
+    entity_reference = c.LXB_DOM_NODE_TYPE_ENTITY_REFERENCE, // historical
+    entity = c.LXB_DOM_NODE_TYPE_ENTITY, // historical
+    processing_instruction = c.LXB_DOM_NODE_TYPE_PROCESSING_INSTRUCTION,
+    comment = c.LXB_DOM_NODE_TYPE_COMMENT,
+    document = c.LXB_DOM_NODE_TYPE_DOCUMENT,
+    document_type = c.LXB_DOM_NODE_TYPE_DOCUMENT_TYPE,
+    document_fragment = c.LXB_DOM_NODE_TYPE_DOCUMENT_FRAGMENT,
+    notation = c.LXB_DOM_NODE_TYPE_NOTATION, // historical
+    last_entry = c.LXB_DOM_NODE_TYPE_LAST_ENTRY,
 };
 
 pub inline fn nodeEventTarget(node: *Node) *EventTarget {
@@ -189,6 +189,10 @@ pub inline fn nodeTag(node: *Node) Tag {
         val = 0;
     }
     return @intToEnum(Tag, val);
+}
+
+pub inline fn nodeType(node: *Node) NodeType {
+    return @intToEnum(NodeType, node.type);
 }
 
 pub const nodeWalker = (fn (node: ?*Node, _: ?*anyopaque) callconv(.C) Action);
