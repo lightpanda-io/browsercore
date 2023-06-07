@@ -70,6 +70,13 @@ pub const Node = struct {
         }
         return Node.toInterface(self.prev);
     }
+
+    pub fn get_parentElement(self: *parser.Node) ?HTMLElem.Union {
+        if (self.parent == null) {
+            return null;
+        }
+        return HTMLElem.toInterface(HTMLElem.Union, @ptrCast(*parser.Element, self.parent));
+    }
 };
 
 pub const Types = generate.Tuple(.{DOMElem.Types});
@@ -115,4 +122,11 @@ pub fn testExecFn(
         .{ .src = "document.getElementById('content').previousSibling", .ex = "null" },
     };
     try checkCases(js_env, &prev_sibling);
+
+    var parent = [_]Case{
+        .{ .src = "let parent = document.getElementById('last').parentElement", .ex = "undefined" },
+        .{ .src = "parent.localName", .ex = "div" },
+        .{ .src = "parent.__proto__.constructor.name", .ex = "HTMLDivElement" },
+    };
+    try checkCases(js_env, &parent);
 }
