@@ -454,7 +454,7 @@ pub const HTMLVideoElement = struct {
     pub const mem_guarantied = true;
 };
 
-pub fn ElementToHTMLElementInterface(elem: *parser.Element) HTMLElements {
+pub fn toInterface(comptime T: type, elem: *parser.Element) T {
     const tag = parser.nodeTag(parser.elementNode(elem));
     return switch (tag) {
         .a => .{ .HTMLAnchorElement = @ptrCast(*parser.Anchor, elem) },

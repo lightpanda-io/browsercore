@@ -4,7 +4,7 @@ const Console = @import("jsruntime").Console;
 
 // DOM
 const EventTarget = @import("dom/event_target.zig").EventTarget;
-const Node = @import("dom/node.zig").Node;
+const N = @import("dom/node.zig");
 const Element = @import("dom/element.zig").Element;
 const Document = @import("dom/document.zig").Document;
 
@@ -19,7 +19,8 @@ const interfaces = .{
 
     // DOM
     EventTarget,
-    Node,
+    N.Node,
+    N.NodesTypes,
     Element,
     Document,
 

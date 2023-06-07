@@ -22,18 +22,21 @@ pub const HTMLDocument = struct {
         return parser.documentHTMLBody(self);
     }
 
-    pub fn _getElementById(self: *parser.DocumentHTML, id: []u8) ?*parser.HTMLElement {
+    pub fn _getElementById(self: *parser.DocumentHTML, id: []u8) ?E.HTMLElements {
         const body_html = parser.documentHTMLBody(self);
         const body_dom = @ptrCast(*parser.Element, body_html);
         const doc_dom = @ptrCast(*parser.Document, self);
         const elem_dom = Document.getElementById(doc_dom, body_dom, id);
-        return @ptrCast(*parser.HTMLElement, elem_dom);
+        if (elem_dom) |elem| {
+            return E.toInterface(E.HTMLElements, elem);
+        }
+        return null;
     }
 
     pub fn _createElement(self: *parser.DocumentHTML, tag_name: []const u8) E.HTMLElements {
         const doc_dom = parser.documentHTMLToDocument(self);
         const base = parser.documentCreateElement(doc_dom, tag_name);
-        return E.ElementToHTMLElementInterface(base);
+        return E.toInterface(E.HTMLElements, base);
     }
 };
 
@@ -55,8 +58,8 @@ pub fn testExecFn(
 
     var getElementById = [_]Case{
         .{ .src = "let getElementById = document.getElementById('content')", .ex = "undefined" },
-        .{ .src = "getElementById.constructor.name", .ex = "HTMLElement" },
-        .{ .src = "getElementById.localName", .ex = "main" },
+        .{ .src = "getElementById.constructor.name", .ex = "HTMLDivElement" },
+        .{ .src = "getElementById.localName", .ex = "div" },
     };
     try checkCases(js_env, &getElementById);
 

@@ -1,6 +1,6 @@
 pub const html: []const u8 =
-    \\<main id='content'>
+    \\<div id='content'>
     \\<a href='foo'>OK</a>
-    \\<p>blah-blah-blah</p>
-    \\</main>
+    \\<p id='last'></p>
+    \\</div>
 ;

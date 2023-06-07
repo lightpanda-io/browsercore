@@ -5,7 +5,9 @@ const generate = @import("generate.zig");
 
 const parser = @import("parser.zig");
 const DOM = @import("dom.zig");
-const testExecFn = @import("html/document.zig").testExecFn;
+
+const DocTestExecFn = @import("html/document.zig").testExecFn;
+const NodeTestExecFn = @import("dom/node.zig").testExecFn;
 
 const html_test = @import("html_test.zig").html;
 
@@ -25,7 +27,8 @@ fn testsExecFn(
     try js_env.addObject(apis, doc, "document");
 
     // run tests
-    try testExecFn(alloc, js_env, apis);
+    try DocTestExecFn(alloc, js_env, apis);
+    try NodeTestExecFn(alloc, js_env, apis);
 }
 
 test {
