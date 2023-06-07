@@ -10,8 +10,7 @@ const Document = @import("dom/document.zig").Document;
 
 // HTML
 pub const HTMLDocument = @import("html/document.zig").HTMLDocument;
-
-const E = @import("html/elements.zig");
+const HTMLElem = @import("html/elements.zig");
 
 // Interfaces
 const interfaces = .{
@@ -20,14 +19,14 @@ const interfaces = .{
     // DOM
     EventTarget,
     N.Node,
-    N.NodesTypes,
+    N.Types,
     Element,
     Document,
 
     // HTML
     HTMLDocument,
-    E.HTMLElement,
-    E.HTMLMediaElement,
-    E.HTMLElementsTypes,
+    HTMLElem.HTMLElement,
+    HTMLElem.HTMLMediaElement,
+    HTMLElem.Types,
 };
 pub const Interfaces = generate.Tuple(interfaces);

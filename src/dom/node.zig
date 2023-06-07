@@ -8,8 +8,8 @@ const generate = @import("../generate.zig");
 const parser = @import("../parser.zig");
 
 const EventTarget = @import("event_target.zig").EventTarget;
-const Element = @import("element.zig").Element;
-const E = @import("../html/elements.zig");
+const DOMElem = @import("element.zig");
+const HTMLElem = @import("../html/elements.zig");
 
 pub fn create_tree(node: ?*parser.Node, _: ?*anyopaque) callconv(.C) parser.Action {
     if (node == null) {
@@ -33,9 +33,9 @@ pub const Node = struct {
         try parser.nodeWalk(self, create_tree);
     }
 
-    pub fn toInterface(node: *parser.Node) Nodes {
+    pub fn toInterface(node: *parser.Node) Union {
         return switch (parser.nodeType(node)) {
-            .element => E.toInterface(Nodes, @ptrCast(*parser.Element, node)),
+            .element => HTMLElem.toInterface(Union, @ptrCast(*parser.Element, node)),
             else => @panic("unknown element"),
         };
     }
@@ -43,28 +43,28 @@ pub const Node = struct {
     // JS funcs
     // --------
 
-    pub fn get_firstChild(self: *parser.Node) ?Nodes {
+    pub fn get_firstChild(self: *parser.Node) ?Union {
         if (self.first_child == null) {
             return null;
         }
         return Node.toInterface(self.first_child);
     }
 
-    pub fn get_lastChild(self: *parser.Node) ?Nodes {
+    pub fn get_lastChild(self: *parser.Node) ?Union {
         if (self.last_child == null) {
             return null;
         }
         return Node.toInterface(self.last_child);
     }
 
-    pub fn get_nextSibling(self: *parser.Node) ?Nodes {
+    pub fn get_nextSibling(self: *parser.Node) ?Union {
         if (self.next == null) {
             return null;
         }
         return Node.toInterface(self.next);
     }
 
-    pub fn get_previousSibling(self: *parser.Node) ?Nodes {
+    pub fn get_previousSibling(self: *parser.Node) ?Union {
         if (self.prev == null) {
             return null;
         }
@@ -72,10 +72,10 @@ pub const Node = struct {
     }
 };
 
-pub const NodesTypes = generate.Tuple(.{E.HTMLElementsTypes});
-const NodesGenerated = generate.Union.compile(NodesTypes);
-pub const Nodes = NodesGenerated._union;
-pub const NodesTags = NodesGenerated._enum;
+pub const Types = generate.Tuple(.{DOMElem.Types});
+const Generated = generate.Union.compile(Types);
+pub const Union = Generated._union;
+pub const Tags = Generated._enum;
 
 // Tests
 // -----

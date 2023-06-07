@@ -12,7 +12,7 @@ pub const HTMLElement = struct {
     pub const mem_guarantied = true;
 };
 
-pub const HTMLElementsTypes = .{
+pub const Types = .{
     HTMLUnknownElement,
     HTMLAnchorElement,
     HTMLAreaElement,
@@ -74,9 +74,9 @@ pub const HTMLElementsTypes = .{
     HTMLUListElement,
     HTMLVideoElement,
 };
-const HTMLElementsGenerated = generate.Union.compile(HTMLElementsTypes);
-pub const HTMLElements = HTMLElementsGenerated._union;
-pub const HTMLElementsTags = HTMLElementsGenerated._enum;
+const Generated = generate.Union.compile(Types);
+pub const Union = Generated._union;
+pub const Tags = Generated._enum;
 
 // Deprecated HTMLElements in Chrome (2023/03/15)
 // HTMLContentelement

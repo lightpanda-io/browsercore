@@ -7,8 +7,7 @@ const Case = jsruntime.test_utils.Case;
 const checkCases = jsruntime.test_utils.checkCases;
 
 const Document = @import("../dom/document.zig").Document;
-
-const E = @import("elements.zig");
+const HTMLElem = @import("elements.zig");
 
 pub const HTMLDocument = struct {
     pub const Self = parser.DocumentHTML;
@@ -22,21 +21,21 @@ pub const HTMLDocument = struct {
         return parser.documentHTMLBody(self);
     }
 
-    pub fn _getElementById(self: *parser.DocumentHTML, id: []u8) ?E.HTMLElements {
+    pub fn _getElementById(self: *parser.DocumentHTML, id: []u8) ?HTMLElem.Union {
         const body_html = parser.documentHTMLBody(self);
         const body_dom = @ptrCast(*parser.Element, body_html);
         const doc_dom = @ptrCast(*parser.Document, self);
         const elem_dom = Document.getElementById(doc_dom, body_dom, id);
         if (elem_dom) |elem| {
-            return E.toInterface(E.HTMLElements, elem);
+            return HTMLElem.toInterface(HTMLElem.Union, elem);
         }
         return null;
     }
 
-    pub fn _createElement(self: *parser.DocumentHTML, tag_name: []const u8) E.HTMLElements {
+    pub fn _createElement(self: *parser.DocumentHTML, tag_name: []const u8) HTMLElem.Union {
         const doc_dom = parser.documentHTMLToDocument(self);
         const base = parser.documentCreateElement(doc_dom, tag_name);
-        return E.toInterface(E.HTMLElements, base);
+        return HTMLElem.toInterface(HTMLElem.Union, base);
     }
 };
 
