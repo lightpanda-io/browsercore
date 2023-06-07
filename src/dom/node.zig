@@ -96,7 +96,7 @@ pub const Node = struct {
     }
 };
 
-pub const Types = generate.Tuple(.{DOMElem.Types});
+pub const Types = generate.Tuple(.{HTMLElem.Types});
 const Generated = generate.Union.compile(Types);
 pub const Union = Generated._union;
 pub const Tags = Generated._enum;
