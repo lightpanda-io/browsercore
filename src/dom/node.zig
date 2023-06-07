@@ -94,6 +94,10 @@ pub const Node = struct {
     pub fn get_nodeType(self: *parser.Node) u8 {
         return @enumToInt(parser.nodeType(self));
     }
+
+    pub fn get_ownerDocument(self: *parser.Node) *parser.DocumentHTML {
+        return @ptrCast(*parser.DocumentHTML, self.owner_document);
+    }
 };
 
 pub const Types = generate.Tuple(.{HTMLElem.Types});
@@ -156,4 +160,10 @@ pub fn testExecFn(
         .{ .src = "document.getElementById('content').firstChild.nodeType === 1", .ex = "true" },
     };
     try checkCases(js_env, &node_type);
+
+    var owner = [_]Case{
+        .{ .src = "let owner = document.getElementById('content').ownerDocument", .ex = "undefined" },
+        .{ .src = "owner.__proto__.constructor.name", .ex = "HTMLDocument" },
+    };
+    try checkCases(js_env, &owner);
 }
