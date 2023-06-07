@@ -29,4 +29,4 @@ const interfaces = .{
     E.HTMLMediaElement,
     E.HTMLElementsTypes,
 };
-pub const Interfaces = generate.TupleInst(generate.TupleT(interfaces), interfaces);
+pub const Interfaces = generate.Tuple(interfaces);
