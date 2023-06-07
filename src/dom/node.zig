@@ -77,6 +77,19 @@ pub const Node = struct {
         }
         return HTMLElem.toInterface(HTMLElem.Union, @ptrCast(*parser.Element, self.parent));
     }
+
+    pub fn get_nodeName(self: *parser.Node) []const u8 {
+        return switch (parser.nodeType(self)) {
+            .element => @tagName(parser.nodeTag(self)), // TODO: upper case, ie. AUDIO instead of audio
+            .text => "#text", // TODO: check https://dom.spec.whatwg.org/#exclusive-text-node
+            .cdata_section => "#cdata-section",
+            .comment => "#comment",
+            .document => "#document",
+            .document_fragment => "#document-fragment",
+            else => @panic("not implemented"),
+            // TODO: attribute, processing_instruction, document_type
+        };
+    }
 };
 
 pub const Types = generate.Tuple(.{DOMElem.Types});
@@ -129,4 +142,9 @@ pub fn testExecFn(
         .{ .src = "parent.__proto__.constructor.name", .ex = "HTMLDivElement" },
     };
     try checkCases(js_env, &parent);
+
+    var node_name = [_]Case{
+        .{ .src = "document.getElementById('content').firstChild.nodeName", .ex = "a" },
+    };
+    try checkCases(js_env, &node_name);
 }
