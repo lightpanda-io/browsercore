@@ -202,10 +202,6 @@ pub inline fn nodeName(node: *Node) [*c]const u8 {
     return c.lxb_dom_node_name(node, &s);
 }
 
-pub inline fn nodeType(node: *Node) NodeType {
-    return @intToEnum(NodeType, node.*.type);
-}
-
 pub inline fn nodeWalk(node: *Node, comptime walker: nodeWalker) !void {
     c.lxb_dom_node_simple_walk(node, walker, null);
 }

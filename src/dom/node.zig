@@ -56,6 +56,20 @@ pub const Node = struct {
         }
         return Node.toInterface(self.last_child);
     }
+
+    pub fn get_nextSibling(self: *parser.Node) ?Nodes {
+        if (self.next == null) {
+            return null;
+        }
+        return Node.toInterface(self.next);
+    }
+
+    pub fn get_previousSibling(self: *parser.Node) ?Nodes {
+        if (self.prev == null) {
+            return null;
+        }
+        return Node.toInterface(self.prev);
+    }
 };
 
 pub const NodesTypes = generate.Tuple(.{E.HTMLElementsTypes});
@@ -85,4 +99,20 @@ pub fn testExecFn(
         .{ .src = "last_child.__proto__.constructor.name", .ex = "HTMLParagraphElement" },
     };
     try checkCases(js_env, &last_child);
+
+    var next_sibling = [_]Case{
+        .{ .src = "let next_sibling = document.getElementById('link').nextSibling", .ex = "undefined" },
+        .{ .src = "next_sibling.localName", .ex = "p" },
+        .{ .src = "next_sibling.__proto__.constructor.name", .ex = "HTMLParagraphElement" },
+        .{ .src = "document.getElementById('content').nextSibling", .ex = "null" },
+    };
+    try checkCases(js_env, &next_sibling);
+
+    var prev_sibling = [_]Case{
+        .{ .src = "let prev_sibling = document.getElementById('last').previousSibling", .ex = "undefined" },
+        .{ .src = "prev_sibling.localName", .ex = "a" },
+        .{ .src = "prev_sibling.__proto__.constructor.name", .ex = "HTMLAnchorElement" },
+        .{ .src = "document.getElementById('content').previousSibling", .ex = "null" },
+    };
+    try checkCases(js_env, &prev_sibling);
 }
