@@ -49,6 +49,13 @@ pub const Node = struct {
         }
         return Node.toInterface(self.first_child);
     }
+
+    pub fn get_lastChild(self: *parser.Node) ?Nodes {
+        if (self.last_child == null) {
+            return null;
+        }
+        return Node.toInterface(self.last_child);
+    }
 };
 
 pub const NodesTypes = generate.Tuple(.{E.HTMLElementsTypes});
@@ -71,4 +78,11 @@ pub fn testExecFn(
         .{ .src = "document.getElementById('last').firstChild", .ex = "null" },
     };
     try checkCases(js_env, &first_child);
+
+    var last_child = [_]Case{
+        .{ .src = "let last_child = document.getElementById('content').lastChild", .ex = "undefined" },
+        .{ .src = "last_child.localName", .ex = "p" },
+        .{ .src = "last_child.__proto__.constructor.name", .ex = "HTMLParagraphElement" },
+    };
+    try checkCases(js_env, &last_child);
 }
