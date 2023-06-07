@@ -90,6 +90,10 @@ pub const Node = struct {
             // TODO: attribute, processing_instruction, document_type
         };
     }
+
+    pub fn get_nodeType(self: *parser.Node) u8 {
+        return @enumToInt(parser.nodeType(self));
+    }
 };
 
 pub const Types = generate.Tuple(.{DOMElem.Types});
@@ -144,7 +148,12 @@ pub fn testExecFn(
     try checkCases(js_env, &parent);
 
     var node_name = [_]Case{
-        .{ .src = "document.getElementById('content').firstChild.nodeName", .ex = "a" },
+        .{ .src = "document.getElementById('content').firstChild.nodeName === 'a'", .ex = "true" },
     };
     try checkCases(js_env, &node_name);
+
+    var node_type = [_]Case{
+        .{ .src = "document.getElementById('content').firstChild.nodeType === 1", .ex = "true" },
+    };
+    try checkCases(js_env, &node_type);
 }
