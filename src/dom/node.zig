@@ -114,6 +114,14 @@ pub const Node = struct {
         }
         return @ptrCast(*parser.DocumentHTML, self.owner_document);
     }
+
+    pub fn get_isConnected(self: *parser.Node) bool {
+        // TODO: handle Shadow DOM
+        if (parser.nodeType(self) == .document) {
+            return true;
+        }
+        return Node.get_parentNode(self) != null;
+    }
 };
 
 pub const Types = generate.Tuple(.{
@@ -191,4 +199,11 @@ pub fn testExecFn(
         .{ .src = "owner2.__proto__.constructor.name", .ex = "HTMLDocument" },
     };
     try checkCases(js_env, &owner);
+
+    var connected = [_]Case{
+        .{ .src = "document.getElementById('content').isConnected", .ex = "true" },
+        .{ .src = "document.isConnected", .ex = "true" },
+        .{ .src = "document.createElement('div').isConnected", .ex = "false" },
+    };
+    try checkCases(js_env, &connected);
 }
