@@ -44,6 +44,8 @@ pub const Node = struct {
     // JS funcs
     // --------
 
+    // Read-only attributes
+
     pub fn get_firstChild(self: *parser.Node) ?Union {
         if (self.first_child == null) {
             return null;
@@ -185,6 +187,8 @@ pub fn testExecFn(
         .{ .src = "let owner = document.getElementById('content').ownerDocument", .ex = "undefined" },
         .{ .src = "owner.__proto__.constructor.name", .ex = "HTMLDocument" },
         .{ .src = "document.ownerDocument", .ex = "null" },
+        .{ .src = "let owner2 = document.createElement('div').ownerDocument", .ex = "undefined" },
+        .{ .src = "owner2.__proto__.constructor.name", .ex = "HTMLDocument" },
     };
     try checkCases(js_env, &owner);
 }
