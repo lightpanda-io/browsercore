@@ -8,7 +8,7 @@ const generate = @import("../generate.zig");
 const parser = @import("../parser.zig");
 
 const EventTarget = @import("event_target.zig").EventTarget;
-const DOMElem = @import("element.zig");
+const HTMLDocument = @import("../html/document.zig").HTMLDocument;
 const HTMLElem = @import("../html/elements.zig");
 
 pub fn create_tree(node: ?*parser.Node, _: ?*anyopaque) callconv(.C) parser.Action {
@@ -36,6 +36,7 @@ pub const Node = struct {
     pub fn toInterface(node: *parser.Node) Union {
         return switch (parser.nodeType(node)) {
             .element => HTMLElem.toInterface(Union, @ptrCast(*parser.Element, node)),
+            .document => .{ .HTMLDocument = @ptrCast(*parser.DocumentHTML, node) },
             else => @panic("unknown element"),
         };
     }
@@ -71,8 +72,18 @@ pub const Node = struct {
         return Node.toInterface(self.prev);
     }
 
+    pub fn get_parentNode(self: *parser.Node) ?Union {
+        if (self.parent == null) {
+            return null;
+        }
+        return Node.toInterface(self.parent);
+    }
+
     pub fn get_parentElement(self: *parser.Node) ?HTMLElem.Union {
         if (self.parent == null) {
+            return null;
+        }
+        if (parser.nodeType(self.parent) != .element) {
             return null;
         }
         return HTMLElem.toInterface(HTMLElem.Union, @ptrCast(*parser.Element, self.parent));
@@ -100,7 +111,10 @@ pub const Node = struct {
     }
 };
 
-pub const Types = generate.Tuple(.{HTMLElem.Types});
+pub const Types = generate.Tuple(.{
+    HTMLDocument,
+    HTMLElem.Types,
+});
 const Generated = generate.Union.compile(Types);
 pub const Union = Generated._union;
 pub const Tags = Generated._enum;
@@ -148,6 +162,9 @@ pub fn testExecFn(
         .{ .src = "let parent = document.getElementById('last').parentElement", .ex = "undefined" },
         .{ .src = "parent.localName", .ex = "div" },
         .{ .src = "parent.__proto__.constructor.name", .ex = "HTMLDivElement" },
+        .{ .src = "let h = document.getElementById('content').parentElement.parentElement", .ex = "undefined" },
+        .{ .src = "h.parentElement", .ex = "null" },
+        .{ .src = "h.parentNode.__proto__.constructor.name", .ex = "HTMLDocument" },
     };
     try checkCases(js_env, &parent);
 

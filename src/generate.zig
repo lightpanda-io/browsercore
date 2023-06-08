@@ -230,8 +230,8 @@ fn isDup(comptime nb: usize, comptime list: [nb]type, comptime T: type, comptime
     return false;
 }
 
-fn dedupIndexes(comptime nb: usize, comptime types: [nb]type) [nb]i8 {
-    var dedup_indexes: [nb]i8 = undefined;
+fn dedupIndexes(comptime nb: usize, comptime types: [nb]type) [nb]i32 {
+    var dedup_indexes: [nb]i32 = undefined;
     for (types) |T, i| {
         if (isDup(nb, types, T, i)) {
             dedup_indexes[i] = -1;
@@ -242,7 +242,7 @@ fn dedupIndexes(comptime nb: usize, comptime types: [nb]type) [nb]i8 {
     return dedup_indexes;
 }
 
-fn dedupNb(comptime nb: usize, comptime dedup_indexes: [nb]i8) usize {
+fn dedupNb(comptime nb: usize, comptime dedup_indexes: [nb]i32) usize {
     var dedup_nb = 0;
     for (dedup_indexes) |index| {
         if (index != -1) {
