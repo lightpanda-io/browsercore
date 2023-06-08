@@ -106,7 +106,10 @@ pub const Node = struct {
         return @enumToInt(parser.nodeType(self));
     }
 
-    pub fn get_ownerDocument(self: *parser.Node) *parser.DocumentHTML {
+    pub fn get_ownerDocument(self: *parser.Node) ?*parser.DocumentHTML {
+        if (parser.nodeType(self) == .document) {
+            return null;
+        }
         return @ptrCast(*parser.DocumentHTML, self.owner_document);
     }
 };
@@ -181,6 +184,7 @@ pub fn testExecFn(
     var owner = [_]Case{
         .{ .src = "let owner = document.getElementById('content').ownerDocument", .ex = "undefined" },
         .{ .src = "owner.__proto__.constructor.name", .ex = "HTMLDocument" },
+        .{ .src = "document.ownerDocument", .ex = "null" },
     };
     try checkCases(js_env, &owner);
 }
