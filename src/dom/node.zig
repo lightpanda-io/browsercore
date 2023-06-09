@@ -8,6 +8,8 @@ const generate = @import("../generate.zig");
 const parser = @import("../parser.zig");
 
 const EventTarget = @import("event_target.zig").EventTarget;
+const CharacterData = @import("character_data.zig").CharacterData;
+const Comment = @import("comment.zig").Comment;
 const HTMLDocument = @import("../html/document.zig").HTMLDocument;
 const HTMLElem = @import("../html/elements.zig");
 
@@ -36,6 +38,7 @@ pub const Node = struct {
     pub fn toInterface(node: *parser.Node) Union {
         return switch (parser.nodeType(node)) {
             .element => HTMLElem.toInterface(Union, @ptrCast(*parser.Element, node)),
+            .comment => .{ .Comment = @ptrCast(*parser.Comment, node) },
             .document => .{ .HTMLDocument = @ptrCast(*parser.DocumentHTML, node) },
             else => @panic("unknown element"),
         };
@@ -125,8 +128,10 @@ pub const Node = struct {
 };
 
 pub const Types = generate.Tuple(.{
-    HTMLDocument,
+    CharacterData,
+    Comment,
     HTMLElem.Types,
+    HTMLDocument,
 });
 const Generated = generate.Union.compile(Types);
 pub const Union = Generated._union;
@@ -144,14 +149,13 @@ pub fn testExecFn(
         .{ .src = "let first_child = document.body.firstChild", .ex = "undefined" },
         .{ .src = "first_child.localName", .ex = "div" },
         .{ .src = "first_child.__proto__.constructor.name", .ex = "HTMLDivElement" },
-        .{ .src = "document.getElementById('last').firstChild", .ex = "null" },
+        .{ .src = "document.getElementById('para').firstChild", .ex = "null" },
     };
     try checkCases(js_env, &first_child);
 
     var last_child = [_]Case{
         .{ .src = "let last_child = document.getElementById('content').lastChild", .ex = "undefined" },
-        .{ .src = "last_child.localName", .ex = "p" },
-        .{ .src = "last_child.__proto__.constructor.name", .ex = "HTMLParagraphElement" },
+        .{ .src = "last_child.__proto__.constructor.name", .ex = "Comment" },
     };
     try checkCases(js_env, &last_child);
 
@@ -164,7 +168,7 @@ pub fn testExecFn(
     try checkCases(js_env, &next_sibling);
 
     var prev_sibling = [_]Case{
-        .{ .src = "let prev_sibling = document.getElementById('last').previousSibling", .ex = "undefined" },
+        .{ .src = "let prev_sibling = document.getElementById('para').previousSibling", .ex = "undefined" },
         .{ .src = "prev_sibling.localName", .ex = "a" },
         .{ .src = "prev_sibling.__proto__.constructor.name", .ex = "HTMLAnchorElement" },
         .{ .src = "document.getElementById('content').previousSibling", .ex = "null" },
@@ -172,7 +176,7 @@ pub fn testExecFn(
     try checkCases(js_env, &prev_sibling);
 
     var parent = [_]Case{
-        .{ .src = "let parent = document.getElementById('last').parentElement", .ex = "undefined" },
+        .{ .src = "let parent = document.getElementById('para').parentElement", .ex = "undefined" },
         .{ .src = "parent.localName", .ex = "div" },
         .{ .src = "parent.__proto__.constructor.name", .ex = "HTMLDivElement" },
         .{ .src = "let h = document.getElementById('content').parentElement.parentElement", .ex = "undefined" },

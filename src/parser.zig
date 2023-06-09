@@ -206,6 +206,14 @@ pub inline fn nodeWalk(node: *Node, comptime walker: nodeWalker) !void {
     c.lxb_dom_node_simple_walk(node, walker, null);
 }
 
+// CharacterData
+
+pub const CharacterData = c.lxb_dom_character_data_t;
+
+// Comment
+
+pub const Comment = c.lxb_dom_comment_t;
+
 // Element
 
 pub const Element = c.lxb_dom_element_t;
