@@ -214,6 +214,10 @@ pub const CharacterData = c.lxb_dom_character_data_t;
 
 pub const Comment = c.lxb_dom_comment_t;
 
+// Text
+
+pub const Text = c.lxb_dom_text_t;
+
 // Element
 
 pub const Element = c.lxb_dom_element_t;

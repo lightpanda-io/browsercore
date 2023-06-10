@@ -8,8 +8,7 @@ const generate = @import("../generate.zig");
 const parser = @import("../parser.zig");
 
 const EventTarget = @import("event_target.zig").EventTarget;
-const CharacterData = @import("character_data.zig").CharacterData;
-const Comment = @import("comment.zig").Comment;
+const CData = @import("character_data.zig");
 const HTMLDocument = @import("../html/document.zig").HTMLDocument;
 const HTMLElem = @import("../html/elements.zig");
 
@@ -39,8 +38,9 @@ pub const Node = struct {
         return switch (parser.nodeType(node)) {
             .element => HTMLElem.toInterface(Union, @ptrCast(*parser.Element, node)),
             .comment => .{ .Comment = @ptrCast(*parser.Comment, node) },
+            .text => .{ .Text = @ptrCast(*parser.Text, node) },
             .document => .{ .HTMLDocument = @ptrCast(*parser.DocumentHTML, node) },
-            else => @panic("unknown element"),
+            else => @panic("node type not handled"),
         };
     }
 
@@ -128,8 +128,7 @@ pub const Node = struct {
 };
 
 pub const Types = generate.Tuple(.{
-    CharacterData,
-    Comment,
+    CData.Types,
     HTMLElem.Types,
     HTMLDocument,
 });
@@ -187,11 +186,17 @@ pub fn testExecFn(
 
     var node_name = [_]Case{
         .{ .src = "document.getElementById('content').firstChild.nodeName === 'a'", .ex = "true" },
+        .{ .src = "document.getElementById('link').firstChild.nodeName === '#text'", .ex = "true" },
+        .{ .src = "document.getElementById('content').lastChild.nodeName === '#comment'", .ex = "true" },
+        .{ .src = "document.nodeName === '#document'", .ex = "true" },
     };
     try checkCases(js_env, &node_name);
 
     var node_type = [_]Case{
         .{ .src = "document.getElementById('content').firstChild.nodeType === 1", .ex = "true" },
+        .{ .src = "document.getElementById('link').firstChild.nodeType === 3", .ex = "true" },
+        .{ .src = "document.getElementById('content').lastChild.nodeType === 8", .ex = "true" },
+        .{ .src = "document.nodeType === 9", .ex = "true" },
     };
     try checkCases(js_env, &node_type);
 
