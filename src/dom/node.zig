@@ -49,6 +49,14 @@ pub const Node = struct {
 
     // Read-only attributes
 
+    pub fn get_baseURI(_: *parser.Node) void {
+        // TODO
+    }
+
+    pub fn get_childNodes(_: *parser.Node) void {
+        // TODO
+    }
+
     pub fn get_firstChild(self: *parser.Node) ?Union {
         if (self.first_child == null) {
             return null;
@@ -124,6 +132,24 @@ pub const Node = struct {
             return true;
         }
         return Node.get_parentNode(self) != null;
+    }
+
+    // Read/Write attributes
+
+    pub fn get_nodeValue(_: *parser.Node) void {
+        // TODO
+    }
+
+    pub fn set_nodeValue(_: *parser.Node) void {
+        // TODO
+    }
+
+    pub fn get_textContent(_: *parser.Node) void {
+        // TODO
+    }
+
+    pub fn set_textContent(_: *parser.Node) void {
+        // TODO
     }
 };
 
