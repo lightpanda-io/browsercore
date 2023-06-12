@@ -49,13 +49,13 @@ pub const Node = struct {
 
     // Read-only attributes
 
-    pub fn get_baseURI(_: *parser.Node) void {
-        // TODO
-    }
+    // pub fn get_baseURI(_: *parser.Node) void {
+    //     // TODO
+    // }
 
-    pub fn get_childNodes(_: *parser.Node) void {
-        // TODO
-    }
+    // pub fn get_childNodes(_: *parser.Node) void {
+    //     // TODO
+    // }
 
     pub fn get_firstChild(self: *parser.Node) ?Union {
         if (self.first_child == null) {
@@ -103,16 +103,7 @@ pub const Node = struct {
     }
 
     pub fn get_nodeName(self: *parser.Node) []const u8 {
-        return switch (parser.nodeType(self)) {
-            .element => @tagName(parser.nodeTag(self)), // TODO: upper case, ie. AUDIO instead of audio
-            .text => "#text", // TODO: check https://dom.spec.whatwg.org/#exclusive-text-node
-            .cdata_section => "#cdata-section",
-            .comment => "#comment",
-            .document => "#document",
-            .document_fragment => "#document-fragment",
-            else => @panic("not implemented"),
-            // TODO: attribute, processing_instruction, document_type
-        };
+        return parser.nodeName(self);
     }
 
     pub fn get_nodeType(self: *parser.Node) u8 {
@@ -136,21 +127,21 @@ pub const Node = struct {
 
     // Read/Write attributes
 
-    pub fn get_nodeValue(_: *parser.Node) void {
-        // TODO
-    }
+    // pub fn get_nodeValue(_: *parser.Node) void {
+    //     // TODO
+    // }
 
-    pub fn set_nodeValue(_: *parser.Node) void {
-        // TODO
-    }
+    // pub fn set_nodeValue(_: *parser.Node) void {
+    //     // TODO
+    // }
 
-    pub fn get_textContent(_: *parser.Node) void {
-        // TODO
-    }
+    // pub fn get_textContent(_: *parser.Node) void {
+    //     // TODO
+    // }
 
-    pub fn set_textContent(_: *parser.Node) void {
-        // TODO
-    }
+    // pub fn set_textContent(_: *parser.Node) void {
+    //     // TODO
+    // }
 };
 
 pub const Types = generate.Tuple(.{
@@ -211,7 +202,7 @@ pub fn testExecFn(
     try checkCases(js_env, &parent);
 
     var node_name = [_]Case{
-        .{ .src = "document.getElementById('content').firstChild.nodeName === 'a'", .ex = "true" },
+        .{ .src = "document.getElementById('content').firstChild.nodeName === 'A'", .ex = "true" },
         .{ .src = "document.getElementById('link').firstChild.nodeName === '#text'", .ex = "true" },
         .{ .src = "document.getElementById('content').lastChild.nodeName === '#comment'", .ex = "true" },
         .{ .src = "document.nodeName === '#document'", .ex = "true" },

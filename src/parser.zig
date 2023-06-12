@@ -197,9 +197,9 @@ pub inline fn nodeType(node: *Node) NodeType {
 
 pub const nodeWalker = (fn (node: ?*Node, _: ?*anyopaque) callconv(.C) Action);
 
-pub inline fn nodeName(node: *Node) [*c]const u8 {
+pub inline fn nodeName(node: *Node) []const u8 {
     var s: usize = undefined;
-    return c.lxb_dom_node_name(node, &s);
+    return c.lxb_dom_node_name(node, &s)[0..s];
 }
 
 pub inline fn nodeWalk(node: *Node, comptime walker: nodeWalker) !void {
