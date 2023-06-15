@@ -2,6 +2,9 @@ const std = @import("std");
 
 const c = @cImport({
     @cInclude("lexbor/html/html.h");
+    @cInclude("lexbor/dom/interfaces/character_data.h");
+    @cInclude("lexbor/dom/interfaces/comment.h");
+    @cInclude("lexbor/dom/interfaces/text.h");
 });
 
 // Public API
