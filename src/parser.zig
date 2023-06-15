@@ -213,6 +213,17 @@ pub inline fn nodeWalk(node: *Node, comptime walker: nodeWalker) !void {
 
 pub const CharacterData = c.lxb_dom_character_data_t;
 
+pub inline fn characterDataValue(node: *Node) []const u8 {
+    const char_data = @ptrCast(*CharacterData, node);
+    const str = char_data.data;
+    return str.data[0..str.length];
+}
+
+pub inline fn characterDataValueSet(node: *Node, data: []u8) void {
+    const char_data = @ptrCast(*CharacterData, node);
+    _ = c.lxb_dom_character_data_replace(char_data, data.ptr, data.len, 0, 0);
+}
+
 // Comment
 
 pub const Comment = c.lxb_dom_comment_t;

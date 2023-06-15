@@ -127,13 +127,21 @@ pub const Node = struct {
 
     // Read/Write attributes
 
-    // pub fn get_nodeValue(_: *parser.Node) void {
-    //     // TODO
-    // }
+    pub fn get_nodeValue(self: *parser.Node) ?[]const u8 {
+        return switch (parser.nodeType(self)) {
+            // TODO: attribute
+            .cdata_section, .comment, .text => parser.characterDataValue(self),
+            else => null,
+        };
+    }
 
-    // pub fn set_nodeValue(_: *parser.Node) void {
-    //     // TODO
-    // }
+    pub fn set_nodeValue(self: *parser.Node, data: []u8) void {
+        switch (parser.nodeType(self)) {
+            // TODO: attribute
+            .cdata_section, .comment, .text => parser.characterDataValueSet(self, data),
+            else => {},
+        }
+    }
 
     // pub fn get_textContent(_: *parser.Node) void {
     //     // TODO
@@ -232,4 +240,15 @@ pub fn testExecFn(
         .{ .src = "document.createElement('div').isConnected", .ex = "false" },
     };
     try checkCases(js_env, &connected);
+
+    var node_value = [_]Case{
+        .{ .src = "document.getElementById('content').lastChild.nodeValue === 'comment'", .ex = "true" },
+        .{ .src = "document.getElementById('link').nodeValue === null", .ex = "true" },
+        .{ .src = "let text = document.getElementById('link').firstChild", .ex = "undefined" },
+        .{ .src = "text.nodeValue === 'OK'", .ex = "true" },
+        .{ .src = "text.nodeValue = 'OK modified'", .ex = "OK modified" },
+        .{ .src = "text.nodeValue === 'OK modified'", .ex = "true" },
+        .{ .src = "document.getElementById('link').nodeValue = 'nothing'", .ex = "nothing" },
+    };
+    try checkCases(js_env, &node_value);
 }
