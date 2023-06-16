@@ -209,6 +209,17 @@ pub inline fn nodeWalk(node: *Node, comptime walker: nodeWalker) !void {
     c.lxb_dom_node_simple_walk(node, walker, null);
 }
 
+pub inline fn nodeTextContent(node: *Node) []const u8 {
+    var len: usize = undefined;
+    const text_content = c.lxb_dom_node_text_content(node, &len);
+    return text_content[0..len];
+}
+
+pub inline fn nodeTextContentSet(node: *Node, data: []u8) void {
+    _ = c.lxb_dom_node_text_content_set(node, data.ptr, data.len);
+    // TODO: do we need to check the return status and raise an exception if wrong?
+}
+
 // CharacterData
 
 pub const CharacterData = c.lxb_dom_character_data_t;
@@ -222,6 +233,7 @@ pub inline fn characterDataValue(node: *Node) []const u8 {
 pub inline fn characterDataValueSet(node: *Node, data: []u8) void {
     const char_data = @ptrCast(*CharacterData, node);
     _ = c.lxb_dom_character_data_replace(char_data, data.ptr, data.len, 0, 0);
+    // TODO: do we need to check the return status and raise an exception if wrong?
 }
 
 // Comment

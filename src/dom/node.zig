@@ -143,13 +143,13 @@ pub const Node = struct {
         }
     }
 
-    // pub fn get_textContent(_: *parser.Node) void {
-    //     // TODO
-    // }
+    pub fn get_textContent(self: *parser.Node) []const u8 {
+        return parser.nodeTextContent(self);
+    }
 
-    // pub fn set_textContent(_: *parser.Node) void {
-    //     // TODO
-    // }
+    pub fn set_textContent(self: *parser.Node, data: []u8) void {
+        return parser.nodeTextContentSet(self, data);
+    }
 };
 
 pub const Types = generate.Tuple(.{
@@ -173,7 +173,7 @@ pub fn testExecFn(
         .{ .src = "let first_child = document.body.firstChild", .ex = "undefined" },
         .{ .src = "first_child.localName", .ex = "div" },
         .{ .src = "first_child.__proto__.constructor.name", .ex = "HTMLDivElement" },
-        .{ .src = "document.getElementById('para').firstChild", .ex = "null" },
+        .{ .src = "document.getElementById('para-empty').firstChild.firstChild", .ex = "null" },
     };
     try checkCases(js_env, &first_child);
 
@@ -192,7 +192,7 @@ pub fn testExecFn(
     try checkCases(js_env, &next_sibling);
 
     var prev_sibling = [_]Case{
-        .{ .src = "let prev_sibling = document.getElementById('para').previousSibling", .ex = "undefined" },
+        .{ .src = "let prev_sibling = document.getElementById('para-empty').previousSibling", .ex = "undefined" },
         .{ .src = "prev_sibling.localName", .ex = "a" },
         .{ .src = "prev_sibling.__proto__.constructor.name", .ex = "HTMLAnchorElement" },
         .{ .src = "document.getElementById('content').previousSibling", .ex = "null" },
@@ -251,4 +251,14 @@ pub fn testExecFn(
         .{ .src = "document.getElementById('link').nodeValue = 'nothing'", .ex = "nothing" },
     };
     try checkCases(js_env, &node_value);
+
+    var node_text_content = [_]Case{
+        .{ .src = "text.textContent === 'OK modified'", .ex = "true" },
+        .{ .src = "text.textContent === 'OK modified'", .ex = "true" },
+        .{ .src = "document.getElementById('para-empty').textContent === ''", .ex = "true" },
+        .{ .src = "document.getElementById('content').textContent === 'OK modified And'", .ex = "true" },
+        .{ .src = "document.getElementById('para-empty').textContent = 'OK'", .ex = "OK" },
+        .{ .src = "document.getElementById('para-empty').firstChild.nodeName === '#text'", .ex = "true" },
+    };
+    try checkCases(js_env, &node_text_content);
 }
