@@ -220,6 +220,10 @@ pub inline fn nodeTextContentSet(node: *Node, data: []u8) void {
     // TODO: do we need to check the return status and raise an exception if wrong?
 }
 
+pub inline fn nodeAppendChild(node: *Node, child: *Node) void {
+    c.lxb_dom_node_insert_child(node, child);
+}
+
 // CharacterData
 
 pub const CharacterData = c.lxb_dom_character_data_t;

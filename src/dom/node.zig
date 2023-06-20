@@ -40,7 +40,7 @@ pub const Node = struct {
             .comment => .{ .Comment = @ptrCast(*parser.Comment, node) },
             .text => .{ .Text = @ptrCast(*parser.Text, node) },
             .document => .{ .HTMLDocument = @ptrCast(*parser.DocumentHTML, node) },
-            else => @panic("node type not handled"),
+            else => @panic("node type not handled"), // TODO
         };
     }
 
@@ -150,6 +150,14 @@ pub const Node = struct {
     pub fn set_textContent(self: *parser.Node, data: []u8) void {
         return parser.nodeTextContentSet(self, data);
     }
+
+    // Methods
+
+    pub fn _appendChild(self: *parser.Node, child: *parser.Node) Union {
+        // TODO: DocumentFragment special case
+        parser.nodeAppendChild(self, child);
+        return Node.toInterface(child);
+    }
 };
 
 pub const Types = generate.Tuple(.{
@@ -170,6 +178,10 @@ pub fn testExecFn(
     comptime _: []jsruntime.API,
 ) !void {
     var first_child = [_]Case{
+        // for next test cases
+        .{ .src = "let content = document.getElementById('content')", .ex = "undefined" },
+        .{ .src = "let link = document.getElementById('link')", .ex = "undefined" },
+
         .{ .src = "let first_child = document.body.firstChild", .ex = "undefined" },
         .{ .src = "first_child.localName", .ex = "div" },
         .{ .src = "first_child.__proto__.constructor.name", .ex = "HTMLDivElement" },
@@ -178,16 +190,16 @@ pub fn testExecFn(
     try checkCases(js_env, &first_child);
 
     var last_child = [_]Case{
-        .{ .src = "let last_child = document.getElementById('content').lastChild", .ex = "undefined" },
+        .{ .src = "let last_child = content.lastChild", .ex = "undefined" },
         .{ .src = "last_child.__proto__.constructor.name", .ex = "Comment" },
     };
     try checkCases(js_env, &last_child);
 
     var next_sibling = [_]Case{
-        .{ .src = "let next_sibling = document.getElementById('link').nextSibling", .ex = "undefined" },
+        .{ .src = "let next_sibling = link.nextSibling", .ex = "undefined" },
         .{ .src = "next_sibling.localName", .ex = "p" },
         .{ .src = "next_sibling.__proto__.constructor.name", .ex = "HTMLParagraphElement" },
-        .{ .src = "document.getElementById('content').nextSibling", .ex = "null" },
+        .{ .src = "content.nextSibling", .ex = "null" },
     };
     try checkCases(js_env, &next_sibling);
 
@@ -195,7 +207,7 @@ pub fn testExecFn(
         .{ .src = "let prev_sibling = document.getElementById('para-empty').previousSibling", .ex = "undefined" },
         .{ .src = "prev_sibling.localName", .ex = "a" },
         .{ .src = "prev_sibling.__proto__.constructor.name", .ex = "HTMLAnchorElement" },
-        .{ .src = "document.getElementById('content').previousSibling", .ex = "null" },
+        .{ .src = "content.previousSibling", .ex = "null" },
     };
     try checkCases(js_env, &prev_sibling);
 
@@ -203,30 +215,30 @@ pub fn testExecFn(
         .{ .src = "let parent = document.getElementById('para').parentElement", .ex = "undefined" },
         .{ .src = "parent.localName", .ex = "div" },
         .{ .src = "parent.__proto__.constructor.name", .ex = "HTMLDivElement" },
-        .{ .src = "let h = document.getElementById('content').parentElement.parentElement", .ex = "undefined" },
+        .{ .src = "let h = content.parentElement.parentElement", .ex = "undefined" },
         .{ .src = "h.parentElement", .ex = "null" },
         .{ .src = "h.parentNode.__proto__.constructor.name", .ex = "HTMLDocument" },
     };
     try checkCases(js_env, &parent);
 
     var node_name = [_]Case{
-        .{ .src = "document.getElementById('content').firstChild.nodeName === 'A'", .ex = "true" },
-        .{ .src = "document.getElementById('link').firstChild.nodeName === '#text'", .ex = "true" },
-        .{ .src = "document.getElementById('content').lastChild.nodeName === '#comment'", .ex = "true" },
+        .{ .src = "content.firstChild.nodeName === 'A'", .ex = "true" },
+        .{ .src = "link.firstChild.nodeName === '#text'", .ex = "true" },
+        .{ .src = "content.lastChild.nodeName === '#comment'", .ex = "true" },
         .{ .src = "document.nodeName === '#document'", .ex = "true" },
     };
     try checkCases(js_env, &node_name);
 
     var node_type = [_]Case{
-        .{ .src = "document.getElementById('content').firstChild.nodeType === 1", .ex = "true" },
-        .{ .src = "document.getElementById('link').firstChild.nodeType === 3", .ex = "true" },
-        .{ .src = "document.getElementById('content').lastChild.nodeType === 8", .ex = "true" },
+        .{ .src = "content.firstChild.nodeType === 1", .ex = "true" },
+        .{ .src = "link.firstChild.nodeType === 3", .ex = "true" },
+        .{ .src = "content.lastChild.nodeType === 8", .ex = "true" },
         .{ .src = "document.nodeType === 9", .ex = "true" },
     };
     try checkCases(js_env, &node_type);
 
     var owner = [_]Case{
-        .{ .src = "let owner = document.getElementById('content').ownerDocument", .ex = "undefined" },
+        .{ .src = "let owner = content.ownerDocument", .ex = "undefined" },
         .{ .src = "owner.__proto__.constructor.name", .ex = "HTMLDocument" },
         .{ .src = "document.ownerDocument", .ex = "null" },
         .{ .src = "let owner2 = document.createElement('div').ownerDocument", .ex = "undefined" },
@@ -235,20 +247,20 @@ pub fn testExecFn(
     try checkCases(js_env, &owner);
 
     var connected = [_]Case{
-        .{ .src = "document.getElementById('content').isConnected", .ex = "true" },
+        .{ .src = "content.isConnected", .ex = "true" },
         .{ .src = "document.isConnected", .ex = "true" },
         .{ .src = "document.createElement('div').isConnected", .ex = "false" },
     };
     try checkCases(js_env, &connected);
 
     var node_value = [_]Case{
-        .{ .src = "document.getElementById('content').lastChild.nodeValue === 'comment'", .ex = "true" },
-        .{ .src = "document.getElementById('link').nodeValue === null", .ex = "true" },
-        .{ .src = "let text = document.getElementById('link').firstChild", .ex = "undefined" },
+        .{ .src = "content.lastChild.nodeValue === 'comment'", .ex = "true" },
+        .{ .src = "link.nodeValue === null", .ex = "true" },
+        .{ .src = "let text = link.firstChild", .ex = "undefined" },
         .{ .src = "text.nodeValue === 'OK'", .ex = "true" },
         .{ .src = "text.nodeValue = 'OK modified'", .ex = "OK modified" },
         .{ .src = "text.nodeValue === 'OK modified'", .ex = "true" },
-        .{ .src = "document.getElementById('link').nodeValue = 'nothing'", .ex = "nothing" },
+        .{ .src = "link.nodeValue = 'nothing'", .ex = "nothing" },
     };
     try checkCases(js_env, &node_value);
 
@@ -256,9 +268,17 @@ pub fn testExecFn(
         .{ .src = "text.textContent === 'OK modified'", .ex = "true" },
         .{ .src = "text.textContent === 'OK modified'", .ex = "true" },
         .{ .src = "document.getElementById('para-empty').textContent === ''", .ex = "true" },
-        .{ .src = "document.getElementById('content').textContent === 'OK modified And'", .ex = "true" },
+        .{ .src = "content.textContent === 'OK modified And'", .ex = "true" },
         .{ .src = "document.getElementById('para-empty').textContent = 'OK'", .ex = "OK" },
         .{ .src = "document.getElementById('para-empty').firstChild.nodeName === '#text'", .ex = "true" },
     };
     try checkCases(js_env, &node_text_content);
+
+    var node_append_child = [_]Case{
+        .{ .src = "let append = document.createElement('h1')", .ex = "undefined" },
+        .{ .src = "content.appendChild(append).toString()", .ex = "[object HTMLHeadingElement]" },
+        .{ .src = "content.lastChild.__proto__.constructor.name", .ex = "HTMLHeadingElement" },
+        .{ .src = "content.appendChild(link).toString()", .ex = "[object HTMLAnchorElement]" },
+    };
+    try checkCases(js_env, &node_append_child);
 }
