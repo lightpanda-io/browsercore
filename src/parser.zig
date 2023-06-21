@@ -83,6 +83,7 @@ pub const Tag = enum(u8) {
     ul = c.LXB_TAG_UL,
     video = c.LXB_TAG_VIDEO,
     undef = c.LXB_TAG__UNDEF,
+    // TODO: wbr
 
     pub fn all() []Tag {
         comptime {
@@ -222,6 +223,10 @@ pub inline fn nodeTextContentSet(node: *Node, data: []u8) void {
 
 pub inline fn nodeAppendChild(node: *Node, child: *Node) void {
     c.lxb_dom_node_insert_child(node, child);
+}
+
+pub inline fn nodeCloneNode(node: *Node, deep: bool) *Node {
+    return c.lxb_dom_node_clone(node, deep);
 }
 
 // CharacterData
