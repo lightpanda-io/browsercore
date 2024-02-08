@@ -3,9 +3,13 @@ const std = @import("std");
 const c = @cImport({
     @cInclude("dom/dom.h");
     @cInclude("dom/bindings/hubbub/parser.h");
+    @cInclude("events/event.h");
+    @cInclude("events/ui_event.h");
 });
 
 const Callback = @import("jsruntime").Callback;
+
+const Window = @import("html/window.zig").Window;
 
 // Vtable
 // ------
@@ -441,6 +445,52 @@ pub fn eventStopImmediatePropagation(evt: *Event) !void {
 pub fn eventPreventDefault(evt: *Event) !void {
     const err = c._dom_event_prevent_default(evt);
     try DOMErr(err);
+}
+
+// UIEvent
+pub const UIEvent = c.dom_ui_event;
+
+pub fn uiEventCreate() !*UIEvent {
+    var evt: ?*UIEvent = undefined;
+    const err = c._dom_ui_event_create(&evt);
+    try DOMErr(err);
+    return evt.?;
+}
+
+pub const UIEventInit = struct {
+    bubbles: bool = false,
+    cancelable: bool = false,
+
+    view: ?Window = null,
+    detail: i32 = 0,
+};
+
+pub fn uiEventInit(evt: *UIEvent, typ: []const u8, opts: UIEventInit) !void {
+    const err = c._dom_ui_event_init(
+        evt,
+        try strFromData(typ),
+        opts.bubbles,
+        opts.cancelable,
+        // TODO pass the Window as view.
+        // opts.view
+        null,
+        opts.detail,
+    );
+    try DOMErr(err);
+}
+
+pub fn uiEventDetail(evt: *UIEvent) !i32 {
+    var res: i32 = undefined;
+    const err = c._dom_ui_event_get_detail(evt, &res);
+    try DOMErr(err);
+    return res;
+}
+
+pub fn uiEventView(_: *UIEvent) !?Window {
+    // TODO retrieve the Window as view.
+    // const err = c._dom_ui_event_get_view(evt, &res);
+    // try DOMErr(err);
+    return null;
 }
 
 // EventHandler
