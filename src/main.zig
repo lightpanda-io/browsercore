@@ -20,6 +20,7 @@ const std = @import("std");
 
 const jsruntime = @import("jsruntime");
 
+const Browser = @import("browser/browser.zig").Browser;
 const server = @import("server.zig");
 
 const parser = @import("netsurf");
@@ -59,7 +60,9 @@ pub fn main() !void {
     defer srv.deinit();
     try srv.listen(addr);
     std.debug.print("Listening on: {s}...\n", .{socket_path});
-    server.socket_fd = srv.sockfd.?;
 
-    try jsruntime.loadEnv(&arena, server.execJS);
+    var browser = try Browser.init(arena.allocator(), vm);
+    defer browser.deinit();
+
+    try server.listen(&browser, srv.sockfd.?);
 }
