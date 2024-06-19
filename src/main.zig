@@ -28,6 +28,7 @@ const parser = @import("netsurf");
 const apiweb = @import("apiweb.zig");
 
 pub const Types = jsruntime.reflect(apiweb.Interfaces);
+pub const UserContext = apiweb.UserContext;
 
 const socket_path = "/tmp/browsercore-server.sock";
 
